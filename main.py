@@ -1,48 +1,36 @@
 from PE import PE
-# global info
 from ConvLayer import ConvLayer
+from utility import *
 
+# global info
 PE_PER_LEAF = 8
 LEAF_COUNT = 8
 INJECTION_RATE = 50 
-LAYER_MEMS = 9
-LAYER_filters = 96
+first_layer_mems = 1
 
-IMG_EDGE = 10
-FILTER_EDGE = 3
+conv_layers_count = 2
 
-PEs = []
-mems = []
+# (filter_count, filter_size)
+layer_desc = [(20, 5), (50, 5), (10, 3)]
 
-for i in range(LAYER_filters):
-    leaf_num = int(i/(PE_PER_LEAF-1))
-    pe_index = i % (PE_PER_LEAF-1)
-    pe_id = (leaf_num*PE_PER_LEAF+pe_index) % (PE_PER_LEAF*LEAF_COUNT)
-    PEs.append(PE(pe_id, "PE", 0))
-
-for i in range(LAYER_MEMS):
-    mems.append(PE(i%LEAF_COUNT, "MEM"))
-
-for i in PEs:
-    for j in mems:
-        j.dests.append(i)
-        if (int(i.id/LEAF_COUNT))%LEAF_COUNT == j.id:
-            i.iterations += 1
-
-    i.dests.append(mems[(int(i.id/LEAF_COUNT))%LEAF_COUNT])
+PEs = PE_gen(layer_desc[0][0], PE_PER_LEAF, LEAF_COUNT)
+mems = mem_gen(first_layer_mems, LEAF_COUNT)
+assign_dests(PEs, mems, LEAF_COUNT)
 
 # generate layers
 layers = []
-layers.append(ConvLayer(9, 96, PEs, mems, PE_PER_LEAF, LEAF_COUNT, 3, 10))
-packets = layers[0].generate_packets(INJECTION_RATE)
+layers.append(ConvLayer(1, layer_desc[0][0], PEs, mems, PE_PER_LEAF, LEAF_COUNT, layer_desc[0][1], 100))
+packets = layers[0].generate_packets(INJECTION_RATE, 0)
+print_packets(packets, 0)
 
-for i in packets:
-    for j in i:
-        print(j)
-# for i in packets:
-#     print(i)
-# for i in mems:
-#     packets.append(i.create_packets(INJECTION_RATE, LEAF_COUNT, PE_PER_LEAF, IMG_EDGE-FILTER_EDGE+1))
+for i in range(conv_layers_count-1):
+        mem_count = layers[i].output_count
+        filter_count = layer_desc[i+1][0]
 
-# for i in PEs:
-#     packets.append(i.create_packets(INJECTION_RATE, LEAF_COUNT, PE_PER_LEAF, IMG_EDGE-FILTER_EDGE+1))
+        PEs = PE_gen(filter_count, PE_PER_LEAF, LEAF_COUNT)
+        mems = mem_gen(mem_count, LEAF_COUNT)
+
+        assign_dests(PEs, mems, LEAF_COUNT)
+        
+        layers.append(ConvLayer(mem_count, filter_count, PEs, mems, PE_PER_LEAF, LEAF_COUNT, layer_desc[i+1][1],layers[i].out_img_size))
+        print_packets(layers[-1].generate_packets(INJECTION_RATE, layers[i].finish_time), i+1)

@@ -14,5 +14,5 @@ class Layer:
         pass
     
     @abstractmethod
-    def generate_packets(self):
+    def generate_packets(self, INJECTION_RATE, start_time):
         pass    

@@ -8,11 +8,11 @@ class PE:
 		self.type = t
 		self.iterations = iterations
 
-	def create_packets(self, injection_rate, leaf_count, PE_per_leaf, row_number=1):
+	def create_packets(self, injection_rate, leaf_count, PE_per_leaf, row_number, start_time):
 		packets = []
+		i = 0
 		for p in range(self.iterations):
 			for i in range(row_number):
-				rand_time = random.randint(i*injection_rate, (i+1)*injection_rate)
+				rand_time = random.randint(i*injection_rate, (i+1)*injection_rate) + start_time
 				packets.append(Packet(rand_time, self.dests, self.type + '_' +str(self.id)))
-
 		return packets
