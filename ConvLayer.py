@@ -6,7 +6,7 @@ class ConvLayer(Layer):
         super().__init__(fmap_count, filter_count, PEs, MEMs, pe_per_leaf, leaf_count)
         self.filter_size = filter_size
         self.input_image_size = img_size
-        self.out_img_size = self.input_image_size-self.filter_size+1
+        self.out_img_size = self.input_image_size-self.filter_size+1 if self.input_image_size-self.filter_size>self.filter_size else self.filter_size
         self.finish_time = 0
         
     def generate_packets(self, INJECTION_RATE, start_time):
