@@ -10,17 +10,9 @@ class Packet:
         
         packet_id += 1
 
-    def __str__(self, is_conv=True):
+    def __str__(self):
         ans = ""
-        
-        if is_conv:
-            for i in self.dests:
-                ans += self.src + "     " + i.type + "_"+ str(i.id) + "      " + str(self.time) + "      " + str(self.id) + "\n"
-        
-            return ans
-
-        else:
-            for i in self.dests:
-                ans += self.src + "     PE_" + str(i) + "      " + str(self.time) + "      " + str(self.id) + "\n"
-            ans += '\n'
-            return ans
+        for i in self.dests:
+            ans += self.src + "     PE_" + str(i) + "      " + str(self.time) + "      " + str(self.id) + "\n"
+        ans += '\n'
+        return ans

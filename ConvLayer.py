@@ -13,7 +13,9 @@ class ConvLayer(Layer):
         packets = []
         self.finish_time = INJECTION_RATE * self.out_img_size + start_time
         for i in range(self.input_count):
-            packets.append(self.MEMs[i%self.leaf_count].create_packets(INJECTION_RATE, self.leaf_count, self.pe_per_leaf, self.out_img_size, start_time))
+            mem = self.MEMs[i%self.leaf_count]
+            packets.append(mem.create_packets(INJECTION_RATE,
+             self.leaf_count, self.pe_per_leaf, self.out_img_size, start_time))
 
         for i in range(self.output_count):
             packets.append(self.PEs[i%(self.leaf_count*(self.pe_per_leaf))].create_packets(INJECTION_RATE, self.leaf_count, self.pe_per_leaf, self.out_img_size, start_time))
