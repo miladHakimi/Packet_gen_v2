@@ -9,15 +9,15 @@ class ConvLayer(Layer):
         self.out_img_size = self.input_image_size-self.filter_size+1 if self.input_image_size-self.filter_size>self.filter_size else self.filter_size
         self.finish_time = 0
         
-    def generate_packets(self, INJECTION_RATE, start_time):
+    def generate_packets(self, INJECTION_RATE, start_time, start_at_z):
         packets = []
-        self.finish_time = INJECTION_RATE * self.out_img_size + start_time
+        self.finish_time = INJECTION_RATE * self.out_img_size + start_time if start_at_z is False else 0
         for i in range(self.input_count):
             mem = self.MEMs[i%self.leaf_count]
             packets.append(mem.create_packets(INJECTION_RATE,
-             self.leaf_count, self.pe_per_leaf, self.out_img_size, start_time))
+             self.leaf_count, self.pe_per_leaf, self.out_img_size, start_time, start_at_z))
 
         for i in range(self.output_count):
-            packets.append(self.PEs[i%(self.leaf_count*(self.pe_per_leaf))].create_packets(INJECTION_RATE, self.leaf_count, self.pe_per_leaf, self.out_img_size, start_time))
+            packets.append(self.PEs[i%(self.leaf_count*(self.pe_per_leaf))].create_packets(INJECTION_RATE, self.leaf_count, self.pe_per_leaf, self.out_img_size, start_time, start_at_z))
 
         return packets

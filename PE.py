@@ -14,7 +14,7 @@ class PE:
 		self.Pe_per_leaf = pe_per_leaf
 		self.packets = []
 
-	def create_packets(self, injection_rate, leaf_count, PE_per_leaf, row_number, start_time):
+	def create_packets(self, injection_rate, leaf_count, PE_per_leaf, row_number, start_time, start_at_z):
 		packets = []
 		i = 0
 		for p in range(self.iterations):
@@ -26,14 +26,14 @@ class PE:
 					else:
 						dests.append(j.id)
 				dests = self.multicast_detect(dests)
-				rand_time = random.randint(i*injection_rate, (i+1)*injection_rate) + start_time
+				rand_time = random.randint(i*injection_rate, (i+1)*injection_rate) + start_time if start_at_z is False else 0
 				for j in dests:
 					packets.append(Packet(rand_time, j, self.type + '_' +str(self.id)))
 
 		self.packets = packets
 		return packets
 
-	def create_packet_fc(self, inj_rate, time_limit, start_time, pe_per_leaf):
+	def create_packet_fc(self, inj_rate, time_limit, start_time, pe_per_leaf, start_at_z):
 		if len(self.dests) == 0:
 			return None
 		packets = []
@@ -45,6 +45,8 @@ class PE:
 		for i in range(iterations):
 			t = random.randint(1 ,r)
 			t += i*r + start_time
+			if start_at_z:
+				t = 0
 			for dest in dests:
 				p = Packet(t, dest, self.type + "_" + str(self.id))
 				packets.append(p)

@@ -5,7 +5,7 @@ import utility as utils
 from FullyConnected import FullyConnected
 PES = {}
 MEMs = {}
-
+start_at_z = 0
 # global info
 PE_PER_LEAF = 8
 LEAF_COUNT = 8
@@ -13,6 +13,7 @@ INJECTION_RATE = 50
 first_layer_mems = 8
 PE_COUNT = (PE_PER_LEAF-1)*LEAF_COUNT
 input_size = 64
+start_at_z = True
 # (filter_count, filter_size)
 # Alex_net
 layer_desc = [(20, 5), (50, 5), (10, 3)]
@@ -36,7 +37,7 @@ assign_dests(PEs, mems, LEAF_COUNT)
 # generate layers
 layers = []
 layers.append(ConvLayer(1, layer_desc[0][0], PEs, mems, PE_PER_LEAF, LEAF_COUNT, layer_desc[0][1], 20))
-packets = layers[0].generate_packets(INJECTION_RATE, 0)
+packets = layers[0].generate_packets(INJECTION_RATE, 0, start_at_z)
 
 for i in range(len(layer_desc)-1):
         mem_count = layers[i].output_count
@@ -48,9 +49,9 @@ for i in range(len(layer_desc)-1):
         assign_dests(PEs, mems, LEAF_COUNT)
         
         layers.append(ConvLayer(mem_count, filter_count, PEs, mems, PE_PER_LEAF, LEAF_COUNT, layer_desc[i+1][1],layers[i].out_img_size))
-        packets = layers[-1].generate_packets(INJECTION_RATE, layers[i].finish_time), i+1
+        packets = layers[-1].generate_packets(INJECTION_RATE, layers[i].finish_time, start_at_z), i+1
      
-packets = fc_gen(PE_PER_LEAF, LEAF_COUNT, layers, fully_connected_settings, INJECTION_RATE, mems, PE_COUNT, PES, MEMs)
+packets = fc_gen(PE_PER_LEAF, LEAF_COUNT, layers, fully_connected_settings, INJECTION_RATE, mems, PE_COUNT, PES, MEMs, start_at_z)
 
 for i in PES:
         PES[i].write_in_file()

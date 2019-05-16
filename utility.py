@@ -48,7 +48,7 @@ def assign_dests(PEs, mems, LEAF_COUNT):
         except IndexError:
             print("problem in assign dests")
     
-def fc_gen(PE_PER_LEAF, LEAF_COUNT, layers, fully_connected_settings, INJECTION_RATE, mems, PE_COUNT, PES, MEMs ):
+def fc_gen(PE_PER_LEAF, LEAF_COUNT, layers, fully_connected_settings, INJECTION_RATE, mems, PE_COUNT, PES, MEMs, start_at_z ):
     m = 0
     max0 = 0
     max1 = 1
@@ -73,6 +73,6 @@ def fc_gen(PE_PER_LEAF, LEAF_COUNT, layers, fully_connected_settings, INJECTION_
             i.set_dests(NEURON_PER_PE)
     packets = []
     for i in Pes:
-            packets.append(i.create_packet_fc(1/(INJECTION_RATE*1.0), 1, layers[-1].finish_time, PE_PER_LEAF-1))
+            packets.append(i.create_packet_fc(1/(INJECTION_RATE*1.0), 1, layers[-1].finish_time, PE_PER_LEAF-1, start_at_z))
     
     return packets
