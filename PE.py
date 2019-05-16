@@ -115,7 +115,7 @@ class PE:
 				list1 = list(destPE)
 				list1[15- j%self.Pe_per_leaf] = '1'
 				destPE = ''.join(list1)
-			writeData +=  destLeaf + destPE + "0" + "       " + str(i.time) +"\n"
+			writeData +=  destLeaf + destPE + "0" + "       " + str(i.time) + "	" + str(i.id)+"\n"
 		
 		return writeData
 
